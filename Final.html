@@ -1,0 +1,289 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/danfojs@0.2.4/lib/bundle.min.js"></script>
+    </head>
+      <body>
+        
+        <div id='pattern'></div>
+        <div id="boxes"></div>
+
+        
+        <script>
+
+
+            var heatmap = {
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "data": {"url": "https://raw.githubusercontent.com/AugustCzy/152_final_mc1/main/MC1/data/data.csv"},
+                "title": "Count of visit by hours",
+                'vconcat': [
+                {
+                    "mark": {"type": "line"},
+                    "width": 800,
+                    "height": 100,
+                    "encoding": {
+                          "x": {
+                              "timeUnit": "utcyearmonthdate",
+                              "field": "Timestamp", 
+                              //"type": "ordinal",
+                          },
+                          "y": {
+                              "aggregate": "count",
+                              "field": "car-id", 
+                          },
+                          "color": {"field": "car-type"},
+                          "opacity": {
+                                  "condition": {"param": "car-type", "value": 1},
+                                  "value": 0.1
+                                      },
+                      },
+
+                    "params": [{
+                          "name": "brush",
+                          "select": {"type": "interval", "encodings": ["x"]}
+                        },
+                        {
+                            "name": "car-type",
+                            "select": {"type": "point", "fields": ["car-type"]},
+                            "bind": "legend"
+                      }],
+
+                },
+                {
+                      "transform": [{
+                              "filter": {"param": "car-type"}
+                            }],
+                      "mark": "rect",
+                      "width": 800,
+                      "height": 400,
+                      "encoding": {
+                          "x": {
+                              "timeUnit": "utcyearmonthdate",
+                              "field": "Timestamp", 
+                              "bin": {"extent": {"param": "brush"}}
+                          },
+                          "y": {
+                              "field": "gate-name", 
+                          },
+                          "color": {
+                              "aggregate": "count",
+                              "type": "car-id"
+                              },
+                      
+                      "config": {
+                              "view": {
+                              "stroke": "transparent"
+                              }
+                          },
+                        "tooltip": [
+                                {"aggregate": "count",
+                                  "field": "car-id"},
+                                {'field': 'gate-name'},
+                                {"timeUnit": "utcyearmonthdate", 'field': 'Timestamp'}]
+
+                      }
+                },
+                {
+                    "title": "Count of visit by hours",
+                    "width": 800,
+                    "height": 300,
+                    "mark": {"type": "line", "tooltip": true},
+                    "params": [
+                        {
+                            "name": "Gate",
+                            "select": {"type": "point", "fields": ["gate-name"]},
+                            "bind": {"input": "select", "options": [null, 'entrance0', 'entrance1', 'entrance2', 'entrance3', 'entrance4',
+
+                                                                        'general-gate0','general-gate1', 'general-gate2','general-gate3',
+                                                                            'general-gate4', 'general-gate5', 'general-gate6', 'general-gate7',
+
+                                                                        'ranger-stop0', 'ranger-stop1', 'ranger-stop2',
+
+                                                                        'camping0','camping1', 'camping2', 'camping3', 'camping4', 
+                                                                            'camping5', 'camping6', 'camping7', 'camping8',
+
+                                                                        'ranger-base', 'ranger-stop3', 'ranger-stop4', 'ranger-stop5', 'ranger-stop6', 'ranger-stop7', 
+
+                                                                        'gate0', 'gate1', 'gate2','gate3', 'gate4','gate5', 'gate6', 'gate7', 'gate8', 
+                                                                     ]},
+
+                        },
+                    ],
+
+                    "transform": [{"filter": {"param": "Gate"}}],
+                    "encoding": {
+                        "x": {
+                            "timeUnit": "hours",
+                            "field": "Timestamp", 
+                            "type": "ordinal",
+                        },
+                        "y": {
+                            "aggregate": "count",
+                            "field": "car-id", 
+                        },
+                        "color": {"field": "car-type", 'legend':true},
+                        "opacity": {
+                            "condition": [
+                                {"param": "car-type", "value": 1},
+                            ],
+                            "value": 0.1
+                        },
+
+                        "tooltip": [
+                            {"aggregate": "count",
+                            "field": "car-id"},
+                            ]
+                    }
+                }
+                ]       
+                
+            }
+
+
+            var stay_time = {
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "title": "Stay time for each id",
+                "width": 1000,
+                "height": 200,
+                "data": {
+                    "url": "https://raw.githubusercontent.com/AugustCzy/152_final_mc1/main/MC1/data/stay_time.csv?token=AQ6CAK6S5OLCRZATJLNK5X3AQD7EK",
+                    "format": {"type": "csv"}
+                },
+                "mark": {"type": "boxplot", "tooltip": true},
+                "encoding": {
+                "x": {
+                    "field": "hours",
+                    "type": "quantitative",
+                    "scale": {"domain": [-1000, 9000]},
+
+                    "selection": {
+                    "grid": {
+                        "type": "interval", "bind": "scales",
+                        "zoom": "wheel!"
+                        }
+                    },
+                },
+                "tooltip": [
+                    {"field": "hours", "type": "quantitative"},
+                    {"field": "car-id"}
+                ]
+                }
+            }
+
+            var visit_freq = {
+                "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+                "title": "Visit Frequency for each id",
+                "width": 1000,
+                "height": 200,
+                "data": {
+                    "url": "https://raw.githubusercontent.com/AugustCzy/152_final_mc1/main/MC1/data/visit_freq.csv",
+                    "format": {"type": "csv"}
+                },
+                "mark": "boxplot",
+                "encoding": {
+                "x": {
+                "title": "days",  
+                "field": "Date",
+                "type": "quantitative",
+                "scale": {"domain": [-50, 300]},
+
+                "selection": {
+                "grid": {
+                    "type": "interval", "bind": "scales",
+                    "zoom": "wheel!"
+                    }
+                },
+                },
+                "tooltip": [
+                    {"field": "Date"},
+                    {"field": "car-id"}
+                ]
+                }
+            }
+
+
+            var timeline = {
+    			"$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    			"Title": "Violations",
+    			"data": {
+    				"url": "https://raw.githubusercontent.com/AugustCzy/152_final_mc1/main/odd.csv",
+    				"format": {"type":"csv"}
+    			},
+                "width": 1000,
+                "height": 400,
+                "layer": [
+                {
+                    "mark": {
+                        "type" : "line",
+                        "strokeWidth" : 1.5
+                    },
+                    "encoding": {
+                        "detail": {
+                            "field": "car-id",
+                            "type" : "nominal"
+                        },
+                        "color": {"value": "#000000"}
+                    }
+                },
+                {
+                    "params": [{"name": "grid", "select": "interval", "bind": "scales"}],
+                    "mark": {
+                        "type": "point",
+                        "filled": true,
+                    },
+                    "encoding": {
+                        "color": {
+                            "field" : "gate_type",
+                            "type" : "nominal",
+                        
+                        },
+                        "shape": {
+                            "field" : "gate_type",
+                            "type" : "nominal",
+                            "legend": true
+                        },
+                        "size" : {"value" : 100},
+                        "opacity" : {"value": 1},
+                        "tooltip" : {"field" : "gate-name"}
+                    }
+                }
+                ],
+                "encoding": {
+                    "x": {
+                        "field": "Timestamp", 
+                        "type": "temporal"
+                    },
+                    "y": {
+                        "field": "car-id",
+                        "type": "nominal"
+                    }
+                }
+
+            }
+
+
+            var two_boxes = {
+                "vconcat": [stay_time, visit_freq]
+            }
+            
+            //vconcat two_boxes and timeline
+            var individual = {
+                'vconcat': [timeline, two_boxes]
+            }
+
+            var whole = {
+                'hconcat': [heatmap, individual] //replace two_boxes with rgiht side part. 
+            }
+
+
+
+            
+            vegaEmbed('#pattern', whole)
+
+        </script>
+      </body>
+</html>
