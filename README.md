@@ -6,3 +6,4 @@ For the final project, we get to try out VAST Challenge 2017 and my team chose m
 The full analysis is [here](https://github.com/irenechang1510/visual-analytics-final-project/blob/main/comp152va%20final-project.pdf)
 
 ![](https://github.com/irenechang1510/Visual-Analytics-Final-Proj/blob/main/Screen%20Shot%202021-05-11%20at%201.53.04%20PM.png)
+
